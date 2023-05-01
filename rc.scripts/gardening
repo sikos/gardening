@@ -31,7 +31,7 @@ case "$1" in
   start)
         log_daemon_msg "Starting moisturizer server" "moisturizer" || true
         # shellcheck disable=SC2086
-        if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh ; then
+        if start-stop-daemon --background  --start --quiet --oknodo --make-pid --pidfile /run/moisturizer.pid --startas /usr/bin/python3 -- /home/wwu/gardening/python/moisturizer.py ; then
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
@@ -39,7 +39,7 @@ case "$1" in
         ;;
   stop)
         log_daemon_msg "Stopping moisturizer server" "moisturizer" || true
-        if start-stop-daemon --stop --quiet --oknodo --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
+        if start-stop-daemon --stop --quiet --oknodo --pidfile /run/moisturizer.pid  --startas /usr/bin/python3 -- /home/wwu/gardening/python/moisturizer.py; then
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
@@ -49,7 +49,7 @@ case "$1" in
   restart)
         log_daemon_msg "Restarting moisturizer server" "moisturizer" || true
         start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh
-        if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
+        if start-stop-daemon --background --start --quiet --oknodo --chuid 0:0  --make-pid --pidfile /run/moisturizer.pid  --startas /usr/bin/python3 -- /home/wwu/gardening/python/moisturizer.py; then
             log_end_msg 0 || true
         else
             log_end_msg 1 || true
