@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 moisturizer.py
+python3  /home/wwu/gardening/python/moisturizer.py
