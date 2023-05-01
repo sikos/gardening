@@ -14,7 +14,6 @@ set -e
 # /etc/init.d/ssh: start and stop the OpenBSD "secure shell(tm)" daemon
 
 test -x /home/wwu/gardening/python/moisturizer.py || exit 0
-( /home/wwu/gardening/python/moisturizer.py -\? 2>&1 | grep -q OpenSSH ) 2>/dev/null || exit 0
 
 umask 022
 
@@ -30,7 +29,7 @@ export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 
 case "$1" in
   start)
-        log_daemon_msg "Starting moisturizer server" "moisturizer.py" || true
+        log_daemon_msg "Starting moisturizer server" "moisturizer" || true
         # shellcheck disable=SC2086
         if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh ; then
             log_end_msg 0 || true
@@ -39,7 +38,7 @@ case "$1" in
         fi
         ;;
   stop)
-        log_daemon_msg "Stopping moisturizer server" "moisturizer.py" || true
+        log_daemon_msg "Stopping moisturizer server" "moisturizer" || true
         if start-stop-daemon --stop --quiet --oknodo --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
             log_end_msg 0 || true
         else
@@ -48,7 +47,7 @@ case "$1" in
         ;;
 
   restart)
-        log_daemon_msg "Restarting moisturizer server" "sshd" || true
+        log_daemon_msg "Restarting moisturizer server" "moisturizer" || true
         start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh
         if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
             log_end_msg 0 || true

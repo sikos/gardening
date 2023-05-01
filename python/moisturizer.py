@@ -21,7 +21,7 @@ interval = 3600*24*2
 water = 2.5
 
 def detect_moist():
-    def result=False
+    result=False
     GPIO.output(relay2,False)
     time.sleep(water)
     if (GPIO.input(29))==1:
