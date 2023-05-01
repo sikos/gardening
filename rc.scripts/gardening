@@ -1,0 +1,69 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:             moisturizer.py
+# Required-Start:       $remote_fs $syslog
+# Required-Stop:        $remote_fs $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:
+# Short-Description:    OpenBSD Secure Shell server
+### END INIT INFO
+
+set -e
+
+# /etc/init.d/ssh: start and stop the OpenBSD "secure shell(tm)" daemon
+
+test -x /home/wwu/gardening/python/moisturizer.py || exit 0
+( /home/wwu/gardening/python/moisturizer.py -\? 2>&1 | grep -q OpenSSH ) 2>/dev/null || exit 0
+
+umask 022
+
+. /lib/lsb/init-functions
+
+
+# Are we running from init?
+run_by_init() {
+    ([ "$previous" ] && [ "$runlevel" ]) || [ "$runlevel" = S ]
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+        log_daemon_msg "Starting moisturizer server" "moisturizer.py" || true
+        # shellcheck disable=SC2086
+        if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh ; then
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+  stop)
+        log_daemon_msg "Stopping moisturizer server" "moisturizer.py" || true
+        if start-stop-daemon --stop --quiet --oknodo --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+
+  restart)
+        log_daemon_msg "Restarting moisturizer server" "sshd" || true
+        start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /run/moisturizer.pid --exec  /home/wwu/gardening/python/moisturizer.sh
+        if start-stop-daemon --start --quiet --oknodo --chuid 0:0 --pidfile /run/moisturizer.pid --exec /home/wwu/gardening/python/moisturizer.sh; then
+            log_end_msg 0 || true
+        else
+            log_end_msg 1 || true
+        fi
+        ;;
+
+  status)
+        status_of_proc -p  /run/moisturizer.pid  /home/wwu/gardening/python/moisturizer.sh  moisturizer && exit 0 || exit $?
+        ;;
+
+  *)
+        log_action_msg "Usage: /etc/init.d/moisturizer {start|stop|restart|status}" || true
+        exit 1
+esac
+
+exit 0
